@@ -17,20 +17,23 @@ export const selectSavings = (state: RootState): number => {
   const items = selectCartItems(state);
   const products = selectProducts(state);
 
+  const DISCOUNTS: Record<string, number> = {
+    bread: 0.10,   // 10%
+    milk: 0.04,    // 4%
+    cheese: 0.15,  // 15% 
+    butter: 0.05,  // 5%
+    soup: 0.10    // 10%
+  };
+
+
   let savings = 0;
 
-  const getPrice = (id: string) => products.find(p => p.id === id)!.price;
+  for (const product of products) {
+    const qty = items[product.id] || 0;
+    const discount = DISCOUNTS[product.id] || 0;
 
-  const cheeseQty = items["cheese"] || 0;
-  savings += Math.floor(cheeseQty / 2) * getPrice("cheese");
-
-  const soupQty = items["soup"] || 0;
-  const breadQty = items["bread"] || 0;
-  const eligibleBread = Math.min(soupQty, breadQty);
-  savings += eligibleBread * (getPrice("bread") / 2);
-
-  const butterQty = items["butter"] || 0;
-  savings += butterQty * (getPrice("butter") / 3);
+    savings += qty * product.price * discount;
+  }
 
   return savings;
 };
